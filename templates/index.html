@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Digital Signage CMS{% endblock %}
+
+{% block content %}
+<div class="hero-section text-center">
+    <div class="container">
+        <h1 class="display-4">Welcome to Your Digital Signage CMS</h1>
+        <p class="lead">Effortlessly manage, schedule, and deploy engaging content across all your digital screens from a single, intuitive platform.</p>
+        <a href="{{ url_for('upload_file') }}" class="btn btn-warning btn-lg me-3">Upload Content Now!</a>
+        <a href="{{ url_for('manage_screens') }}" class="btn btn-outline-light btn-lg">Manage Your Screens</a>
+    </div>
+</div>
+
+<section class="features-section">
+    <h2 class="mb-5">Powerful Features at Your Fingertips</h2>
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="feature-card">
+                <i class="bi bi-cloud-arrow-up-fill feature-icon"></i>
+                <h3>Easy Content Upload</h3>
+                <p>Upload images and videos seamlessly. Our system handles various media formats for your convenience.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="feature-card">
+                <i class="bi bi-display-fill feature-icon"></i>
+                <h3>Dynamic Screen Management</h3>
+                <p>Register new screens automatically by simply accessing their unique display URL. Keep track of all your deployed screens.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="feature-card">
+                <i class="bi bi-send-check-fill feature-icon"></i>
+                <h3>Instant Content Assignment</h3>
+                <p>Assign content to any screen with a few clicks. Updates are pushed immediately to your displays.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="feature-card">
+                <i class="bi bi-clock-history feature-icon"></i>
+                <h3>Real-time Updates</h3>
+                <p>Displays fetch new content every 10 seconds, ensuring your information is always fresh and current.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="feature-card">
+                <i class="bi bi-file-earmark-code-fill feature-icon"></i>
+                <h3>Flexible Display Templates</h3>
+                <p>Use a single dynamic template or create custom HTML files for unique screen layouts and experiences.</p>
+                {# REMOVED THE TYPO: [/div] was here #}
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="feature-card">
+                <i class="bi bi-globe feature-icon"></i>
+                <h3>Cloud-Powered & Accessible</h3>
+                <p>Hosted on a secure cloud server, your CMS is accessible from anywhere, anytime, ensuring reliable operations.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<hr class="my-5">
+
+{# --- Start of "Current Content Items" Card (Now first, full width) --- #}
+<div class="row"> 
+    <div class="col-12 mb-4"> 
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Current Content Items</h5>
+            </div>
+            <div class="card-body">
+                {% if content %}
+                <div class="table-responsive">
+                    <table class="table table-hover table-sm">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Filename</th>
+                                <th>Type</th>
+                                <th>Uploaded</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in content %}
+                            <tr>
+                                <td>{{ item.filename }}</td>
+                                <td>{{ item.mimetype.split('/')[0] | capitalize }}</td>
+                                <td>{{ item.upload_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                                <td class="text-end">
+                                    <form action="{{ url_for('delete_content', content_id=item.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete {{ item.filename }}? This cannot be undone if content is not assigned to any screen.');">
+                                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">No content uploaded yet. <a href="{{ url_for('upload_file') }}">Upload some!</a></p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{# --- Start of "Managed Screens Overview" Card (Now second, full width) --- #}
+<div class="row"> 
+    <div class="col-12 mb-4"> 
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">Managed Screens Overview</h5>
+            </div>
+            <div class="card-body">
+                {% if screens %}
+                <div class="table-responsive">
+                    <table class="table table-hover table-sm">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Screen ID</th>
+                                <th>Assigned Content</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for screen in screens %}
+                            <tr>
+                                <td>
+                                    {{ screen.id }}
+                                    <small class="text-muted d-block">
+                                        <a href="{{ url_for('display_screen', screen_id_param=screen.id) }}" target="_blank" class="text-decoration-none">
+                                            View Display <i class="bi bi-box-arrow-up-right"></i>
+                                        </a>
+                                    </small>
+                                </td>
+                                <td>
+                                    {% if screen.filename %}
+                                        {{ screen.filename }}
+                                    {% else %}
+                                        <span class="text-muted">Not Assigned</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end">
+                                    <a href="{{ url_for('manage_screens') }}" class="btn btn-info btn-sm">Manage</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">No screens registered yet. Access a display URL to register one!</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Signage Display</title>
+    <style>
+        /* Your CSS styling */
+        body {
+            margin: 0;
+            overflow: hidden; /* Hide scrollbars */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh; /* Make sure body takes full viewport height */
+            background-color: black; /* Default background */
+        }
+        #content-display {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+        }
+        img, video {
+            max-width: 100%; /* Image/video fills width if needed */
+            max-height: 100vh; /* Image/video fills height if needed */
+            object-fit: contain; /* Ensures content is fully visible without cropping */
+        }
+        .message {
+            color: white;
+            font-family: sans-serif;
+            font-size: 2em;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="content-display">
+        <div class="message">Loading content...</div>
+    </div>
+
+    <script>
+        // --- Configuration for this display ---
+        // IMPORTANT: If you run this as a local HTML page via `http.server`,
+        // ensure screenId is correctly set here.
+        // If you serve it via Flask as /display/<screen_id>, use "{{ screen_id }}"
+        const screenId = "Iqoo"; // Or "{{ screen_id }}" if served by Flask /display route
+
+        // IMPORTANT: REPLACE THIS LINE with your EC2 Public IPv4 Address or Public IPv4 DNS
+        const flaskIp = "13.53.205.142"; // Your EC2 Public IP or DNS
+
+        // --- API Endpoint ---
+        const apiUrl = `http://${flaskIp}:5000/api/screen/${screenId}`;
+
+        // Get the HTML element where content will be displayed
+        const contentDisplay = document.getElementById('content-display');
+
+        let currentDisplayedContentId = null;
+        let currentMediaType = null; 
+
+        // Function to fetch and display content
+        async function fetchAndDisplayContent() {
+            try {
+                const response = await fetch(apiUrl);
+                const data = await response.json();
+
+                const newContent = data.content;
+                const newMessage = data.message;
+                // Use the content_id provided by the API for comparison
+                const newContentId = newContent ? newContent.content_id : 'no_content'; 
+
+                if (newContentId === currentDisplayedContentId) {
+                    console.log("Content ID is the same, no update needed.");
+                    return; 
+                }
+
+                currentDisplayedContentId = newContentId;
+
+                if (newContent && newContent.url) {
+                    contentDisplay.innerHTML = ''; 
+
+                    const mediaUrl = newContent.url; // This URL now comes fully formed from Flask
+                    const mimeType = newContent.mimetype;
+
+                    if (mimeType.startsWith('image/')) {
+                        const img = document.createElement('img');
+                        img.src = mediaUrl;
+                        img.alt = newContent.filename;
+                        contentDisplay.appendChild(img);
+                        currentMediaType = 'image';
+                    } else if (mimeType.startsWith('video/')) {
+                        const video = document.createElement('video');
+                        video.src = mediaUrl;
+                        video.autoplay = true;
+                        video.loop = true;
+                        video.muted = true;
+                        video.controls = false;
+                        contentDisplay.appendChild(video);
+                        currentMediaType = 'video';
+
+                        video.oncanplaythrough = () => {
+                            video.play().catch(e => {
+                                console.error("Video play failed:", e);
+                                contentDisplay.innerHTML = `<div class="message">Video failed to autoplay. Please check browser settings or video format. (Error: ${e.message})</div>`;
+                            });
+                        };
+                        video.load(); 
+                        video.play().catch(e => {
+                            console.warn("Attempt to play video immediately failed (likely due to policy), will retry on canplaythrough:", e);
+                        });
+
+                    } else {
+                        contentDisplay.innerHTML = `<div class="message">Unsupported content type: ${mimeType}</div>`;
+                        currentMediaType = 'unsupported';
+                    }
+                } else {
+                    contentDisplay.innerHTML = `<div class="message">${newMessage || 'No content assigned to this screen.'}</div>`;
+                    currentMediaType = 'message';
+                }
+            } catch (error) {
+                console.error('Error fetching content:', error);
+                if (currentDisplayedContentId !== 'error') {
+                    contentDisplay.innerHTML = `<div class="message">Error loading content. Please check server and network.</div>`;
+                    currentDisplayedContentId = 'error'; 
+                }
+            }
+        }
+
+        fetchAndDisplayContent();
+
+        setInterval(fetchAndDisplayContent, 30000); // Check for new content every 30 seconds
+    </script>
+</body>
+</html>

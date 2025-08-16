@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Screens - Digital Signage CMS{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Manage Digital Signage Screens</h1>
+
+{# --- Start of "Assign Content to Screen" Card (Now first, full width) --- #}
+<div class="row"> {# This row will contain only the first card #}
+    <div class="col-12 mb-4"> {# col-12 ensures it takes the full width #}
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0">Assign Content to Screen</h5>
+            </div>
+            <div class="card-body">
+                {% if screens and content %}
+                <form action="{{ url_for('assign_content') }}" method="POST">
+                    <div class="mb-3">
+                        <label for="screen_id" class="form-label">Select Screen</label>
+                        <select class="form-select" id="screen_id" name="screen_id" required>
+                            <option value="">Choose...</option>
+                            {% for screen in screens %}
+                            <option value="{{ screen.id }}">{{ screen.id }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="content_id" class="form-label">Select Content to Assign</label>
+                        <select class="form-select" id="content_id" name="content_id" required>
+                            <option value="">Choose...</option>
+                            {% for item in content %}
+                            <option value="{{ item._id }}">{{ item.filename }} ({{ item.mimetype.split('/')[0] | capitalize }})</option>
+                            {% endfor %}
+                        </select>
+                        <div class="form-text">Choose content to assign.</div>
+                    </div>
+                    <button type="submit" class="btn btn-success">Assign Content</button>
+                </form>
+                {% else %}
+                <p class="text-muted">Please ensure you have screens registered and content uploaded before assigning.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{# --- End of "Assign Content to Screen" Card --- #}
+
+{# --- Start of "Registered Screens" Card (Now second, full width) --- #}
+<div class="row"> {# This NEW row will contain only the second card #}
+    <div class="col-12 mb-4"> {# col-12 ensures it takes the full width #}
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">Registered Screens</h5>
+            </div>
+            <div class="card-body">
+                {% if screens %}
+                <div class="table-responsive">
+                    <table class="table table-hover table-sm">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Screen ID</th>
+                                <th>Current Content</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for screen in screens %}
+                            <tr>
+                                <td>
+                                    {{ screen.id }}
+                                    <small class="text-muted d-block">
+                                        <a href="{{ url_for('display_screen', screen_id_param=screen.id) }}" target="_blank" class="text-decoration-none">
+                                            View Display <i class="bi bi-box-arrow-up-right"></i>
+                                        </a>
+                                    </small>
+                                </td>
+                                <td>
+                                    {% if screen.filename %}
+                                        {{ screen.filename }}
+                                    {% else %}
+                                        <span class="text-muted">No Content Assigned</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end">
+                                    <form action="{{ url_for('delete_screen', screen_id=screen.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete screen {{ screen.id }}?');">
+                                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">No screens registered yet. Access a display URL (e.g., `your_ip:5000/display/test_screen`) to automatically register one!</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{# --- End of "Registered Screens" Card --- #}
+{% endblock %}

@@ -1,0 +1,212 @@
+/* Custom CSS for Digital Signage CMS */
+
+/* --- Color Palette --- */
+:root {
+    --primary-color: #4CAF50; /* Green */
+    --primary-dark-color: #388E3C; /* Darker Green for Navbar */
+    --secondary-color: #FFC107; /* Amber */
+    --accent-color: #2196F3; /* Blue */
+    --text-color: #343A40; /* Dark Gray */
+    --light-bg-color: #F8F9FA; /* Light Gray Background */
+    --card-bg-color: #FFFFFF;
+}
+
+/* --- General Body & Typography --- */
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--light-bg-color);
+    color: var(--text-color);
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 600; /* Semi-bold for headings */
+    color: var(--text-color);
+}
+
+.navbar {
+    background-color: var(--primary-dark-color) !important; /* Important to override Bootstrap */
+}
+
+.navbar-brand {
+    font-weight: 700; /* Extra bold for brand */
+}
+
+.navbar-nav .nav-link.active {
+    font-weight: 600;
+    color: var(--secondary-color) !important; /* Active link color */
+}
+
+/* --- Buttons --- */
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+.btn-primary:hover {
+    background-color: var(--primary-dark-color);
+    border-color: var(--primary-dark-color);
+}
+
+.btn-success {
+    background-color: #28a745; /* Bootstrap default green */
+    border-color: #28a745;
+}
+.btn-success:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+}
+
+.btn-info {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+}
+.btn-info:hover {
+    background-color: #1976D2; /* Darker Blue */
+    border-color: #1976D2;
+}
+
+.btn-danger {
+    background-color: #dc3545; /* Bootstrap default red */
+    border-color: #dc3545;
+}
+.btn-danger:hover {
+    background-color: #c82333;
+    border-color: #bd2130;
+}
+
+/* --- Cards --- */
+.card {
+    border: none; /* Remove default card border */
+    border-radius: 0.75rem; /* More rounded corners */
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.08); /* Softer shadow */
+    background-color: var(--card-bg-color);
+}
+
+.card-header {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    background-color: rgba(0, 0, 0, 0.03); /* Slightly grey header */
+    font-weight: 600;
+    padding: 1rem 1.5rem;
+}
+
+.card-header.bg-primary {
+    background-color: var(--primary-color) !important;
+    color: white !important;
+}
+.card-header.bg-success {
+    background-color: #28a745 !important;
+    color: white !important;
+}
+.card-header.bg-info {
+    background-color: var(--accent-color) !important;
+    color: white !important;
+}
+.card-header.bg-secondary {
+    background-color: #6c757d !important;
+    color: white !important;
+}
+
+
+/* --- Tables --- */
+.table {
+    --bs-table-bg: var(--card-bg-color); /* Table background same as card */
+    --bs-table-hover-bg: #e9ecef; /* Lighter hover */
+}
+.table thead th {
+    border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+}
+.table td {
+    vertical-align: middle;
+}
+
+/* --- Hero Section (Jumbotron) --- */
+.hero-section {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark-color));
+    color: white;
+    padding: 5rem 0;
+    margin-bottom: 2rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.1);
+}
+.hero-section h1 {
+    font-size: 3.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: white; /* Ensure heading is white */
+}
+.hero-section p {
+    font-size: 1.25rem;
+    opacity: 0.9;
+    max-width: 800px;
+    margin: 0 auto 2rem auto;
+}
+
+/* --- Features Section --- */
+.features-section {
+    padding: 3rem 0;
+    text-align: center;
+}
+.features-section h2 {
+    font-size: 2.5rem;
+    margin-bottom: 3rem;
+}
+.feature-card {
+    background-color: var(--card-bg-color);
+    padding: 2rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease-in-out;
+    height: 100%; /* Ensure cards are same height in a row */
+}
+.feature-card:hover {
+    transform: translateY(-5px);
+}
+.feature-icon {
+    font-size: 3.5rem;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+.feature-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 0.75rem;
+}
+.feature-card p {
+    font-size: 0.95rem;
+    color: #6c757d;
+}
+
+/* --- Forms --- */
+.form-label {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+.form-control, .form-select {
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid #ced4da;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+.form-control:focus, .form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.25rem rgba(76, 175, 80, 0.25);
+}
+
+/* --- Utility Classes --- */
+.main-content-area {
+    min-height: calc(100vh - 100px); /* Adjust based on navbar height */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .hero-section h1 {
+        font-size: 2.5rem;
+    }
+    .hero-section p {
+        font-size: 1rem;
+    }
+    .features-section h2 {
+        font-size: 2rem;
+    }
+    .feature-icon {
+        font-size: 3rem;
+    }
+}
